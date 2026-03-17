@@ -6,12 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Analizador Léxico (Scanner) para Lenguaje Quetzal.
- *
- * Lee el código fuente carácter a carácter y produce una lista de Tokens.
- *
+ * Analizador Léxico
  * Características del lenguaje que maneja:
- *  - Sin punto y coma → las nuevas líneas delimitan instrucciones
+ *  - Sin punto y coma las nuevas líneas delimitan instrucciones
  *  - Comentarios de línea: //
  *  - Comentarios de bloque: /* ... * /
  *  - Textos: "hola"
@@ -33,21 +30,22 @@ import java.util.Map;
  */
 public class AnalizadorLexico {
 
-    // ── Tabla de palabras reservadas (EXACTAS según la doc oficial) ──────────
+    // ── Tabla de palabras reservadas
     private static final Map<String, TipoToken> PALABRAS_RESERVADAS = new HashMap<>();
 
     static {
-        // --- Tipos de datos ---
-        // NOTA: la doc dice "numero y número son equivalentes (con o sin tilde)"
-        // Por eso ambas formas mapean al mismo token NUMERO.
+        // --- Tipos de datos
         PALABRAS_RESERVADAS.put("entero",     TipoToken.ENTERO);
         PALABRAS_RESERVADAS.put("numero",     TipoToken.NUMERO);
-        PALABRAS_RESERVADAS.put("número",     TipoToken.NUMERO);   // variante con tilde aceptada
+        PALABRAS_RESERVADAS.put("número",     TipoToken.NUMERO);
         PALABRAS_RESERVADAS.put("texto",      TipoToken.TEXTO);
         PALABRAS_RESERVADAS.put("log",        TipoToken.LOG);
         PALABRAS_RESERVADAS.put("vacio",      TipoToken.VACIO);
         PALABRAS_RESERVADAS.put("lista",      TipoToken.LISTA);
         PALABRAS_RESERVADAS.put("jsn",        TipoToken.JSN);
+        PALABRAS_RESERVADAS.put("consola",     TipoToken.CONSOLA);
+        PALABRAS_RESERVADAS.put("pedir",       TipoToken.PEDIR);
+        PALABRAS_RESERVADAS.put ("mostrar",    TipoToken.MOSTRAR);
 
         // --- Mutabilidad ---
         PALABRAS_RESERVADAS.put("var",        TipoToken.VAR);
@@ -87,19 +85,19 @@ public class AnalizadorLexico {
         PALABRAS_RESERVADAS.put("exportar",   TipoToken.EXPORTAR);
         PALABRAS_RESERVADAS.put("desde",      TipoToken.DESDE);
 
-        // --- Manejo de errores ---
+        // --- Manejo de errores excepciones
         PALABRAS_RESERVADAS.put("intentar",   TipoToken.INTENTAR);
         PALABRAS_RESERVADAS.put("capturar",   TipoToken.CAPTURAR);
         PALABRAS_RESERVADAS.put("finalmente", TipoToken.FINALMENTE);
         PALABRAS_RESERVADAS.put("lanzar",     TipoToken.LANZAR);
 
-        // --- Operadores lógicos en español ---
+        // --- Operadores logicos en español
         PALABRAS_RESERVADAS.put("y",          TipoToken.Y);
         PALABRAS_RESERVADAS.put("o",          TipoToken.O);
         PALABRAS_RESERVADAS.put("no",         TipoToken.NO);
     }
 
-    // ── Estado interno ───────────────────────────────────────────────────────
+    // ---Estado interno
     private final String       fuente;
     private int                pos;
     private int                linea;
@@ -116,7 +114,7 @@ public class AnalizadorLexico {
         this.errores  = new ArrayList<>();
     }
 
-    // ── API pública ──────────────────────────────────────────────────────────
+    // ---API publica
 
     /**
      * Ejecuta el análisis léxico y retorna todos los tokens encontrados.
@@ -171,16 +169,16 @@ public class AnalizadorLexico {
     public List<String> getErrores()  { return errores;          }
     public boolean      hayErrores()  { return !errores.isEmpty(); }
 
-    // ── Lectura de comentarios ───────────────────────────────────────────────
+    // --Lectura de comentarios
 
     private void leerComentarioLinea() {
-        avanzar(); avanzar(); // consumir //
+        avanzar(); avanzar();
         StringBuilder sb = new StringBuilder("//");
         while (!fin() && actual() != '\n') {
             sb.append(actual());
             avanzar();
         }
-        // Los comentarios se descartan (no se agregan a la lista de tokens)
+        // Los comentarios no se agregan a token
     }
 
     private void leerComentarioBloque() {
@@ -194,14 +192,14 @@ public class AnalizadorLexico {
             }
             avanzar();
         }
-        // Si llegamos aquí, el comentario no fue cerrado
+        // el comentario no fue cerrado
         errores.add("Error léxico en línea " + lineaInicio + ", col " + colInicio
                 + ": comentario de bloque /* no fue cerrado.");
     }
 
-    // ── Lectura de cadenas ───────────────────────────────────────────────────
+    // ---Lectura de cadenas
 
-    /** Lee: "hola mundo" */
+
     private void leerTexto() {
         int lineaInicio = linea;
         int colInicio   = columna;
@@ -209,10 +207,12 @@ public class AnalizadorLexico {
         StringBuilder sb = new StringBuilder();
 
         while (!fin() && actual() != '"') {
+            // Error: salto de linea dentro de la cadena sin cerrar
             if (actual() == '\n') {
-                errores.add("Error léxico en línea " + lineaInicio
-                        + ": cadena de texto no cerrada (falta \").");
-                tokens.add(new Token(TipoToken.LITERAL_TEXTO, sb.toString(), lineaInicio, colInicio));
+                errores.add("Error lexico en linea " + lineaInicio
+                        + ", col " + colInicio
+                        + ": cadena de texto no cerrada (falta \"\").");
+                tokens.add(new Token(TipoToken.DESCONOCIDO, sb.toString(), lineaInicio, colInicio));
                 return;
             }
             // Secuencias de escape básicas
@@ -231,7 +231,7 @@ public class AnalizadorLexico {
             avanzar();
         }
 
-        if (!fin()) avanzar(); // consumir " de cierre
+        if (!fin()) avanzar();
         tokens.add(new Token(TipoToken.LITERAL_TEXTO, sb.toString(), lineaInicio, colInicio));
     }
 
@@ -258,7 +258,7 @@ public class AnalizadorLexico {
         tokens.add(new Token(TipoToken.LITERAL_TEXTO_INTERP, sb.toString(), lineaInicio, colInicio));
     }
 
-    // ── Lectura de números ───────────────────────────────────────────────────
+    // ----Lectura de números
 
     /** Lee: 42  o  3.14 */
     private void leerNumero() {
@@ -287,7 +287,7 @@ public class AnalizadorLexico {
         tokens.add(new Token(tipo, sb.toString(), lineaInicio, colInicio));
     }
 
-    // ── Lectura de identificadores y palabras reservadas ────────────────────
+    // ----Lectura de identificadores y palabras reservadas--
 
     private void leerIdentificador() {
         int lineaInicio = linea;
@@ -304,7 +304,7 @@ public class AnalizadorLexico {
         tokens.add(new Token(tipo, lexema, lineaInicio, colInicio));
     }
 
-    // ── Lectura de símbolos y operadores ────────────────────────────────────
+    // ----Lectura de símbolos y operadores---
 
     private void leerSimbolo() {
         int  col = columna;
@@ -456,9 +456,9 @@ public class AnalizadorLexico {
         }
     }
 
-    // ── Utilidades de navegación ─────────────────────────────────────────────
+    // ---Utilidades de navegación
 
-    /** Salta espacios, tabulaciones y retornos de carro (pero NO nuevas líneas) */
+    /** Salta espacios, tabulaciones y retornos de carro */
     private void saltarEspacios() {
         while (!fin() && (actual() == ' ' || actual() == '\t' || actual() == '\r')) {
             avanzar();
