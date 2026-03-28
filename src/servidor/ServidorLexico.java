@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ServidorLexico {
 
-    private static final int PUERTO = 8080;
+    private static final int PUERTO = /*8080*/8081;
 
     public static void main(String[] args) throws IOException {
 
