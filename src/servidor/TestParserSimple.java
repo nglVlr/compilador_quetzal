@@ -1,5 +1,6 @@
 package servidor;
 import lexico.*;
+import semantico.AnalizadorSemantico;
 import sintactico.*;
 import sintactico.nodos.*;
 import java.util.*;
@@ -8,7 +9,7 @@ public class TestParserSimple {
     public static void main(String[] args) {
         String codigo = """
                 consola.mostrar("CALCULADORA QUETZAL")
-                
+                //c = 1 + a
                 // Mostrar menú
                 consola.mostrar_informacion("Selecciona una operación:")
                 consola.mostrar("1. Suma")
@@ -89,14 +90,14 @@ public class TestParserSimple {
             """;
 
         System.out.println("════════════════════════════════════════");
-        System.out.println("  COMPILADOR QUETZAL  FASES 1 Y 2");
+        System.out.println("  COMPILADOR QUETZAL  FASES 1, 2 Y 3");
         System.out.println("════════════════════════════════════════\n");
 
         System.out.println("CÓDIGO:");
         System.out.println(codigo);
         System.out.println("\n────────────────────────────────────────");
 
-        // FASE 1
+        // FASE 1 - LÉXICO
         AnalizadorLexico lexer = new AnalizadorLexico(codigo);
         List<Token> tokens = lexer.analizar();
 
@@ -110,7 +111,7 @@ public class TestParserSimple {
         }
         System.out.println("Sin errores");
 
-        // FASE 2
+        // FASE 2 - SINTÁCTICO
         AnalizadorSintactico parser = new AnalizadorSintactico(tokens);
         NodoPrograma ast = parser.analizar();
 
@@ -126,6 +127,29 @@ public class TestParserSimple {
         ImpressorAST imp = new ImpressorAST();
         System.out.println(ast.aceptar(imp));
 
-        System.out.println("COMPILACIÓN EXITOSA");
+        // FASE 3 - SEMÁNTICO
+        AnalizadorSemantico semantico = new AnalizadorSemantico();
+        semantico.analizar(ast);
+
+        System.out.println("\nFASE 3 - SEMÁNTICO:");
+        if (semantico.hayErrores()) {
+            System.out.println("ERRORES:");
+            semantico.getErrores().forEach(e -> System.out.println(e.toString()));
+            return;
+        }
+        System.out.println("Sin errores");
+
+        // Salida 1: Lista de errores semánticos → ya impresa arriba (ninguno)
+
+        // Salida 2: AST anotado con tipos
+        System.out.println("\nTIPOS ANOTADOS (" + semantico.getTiposAnotados().size() + " nodos):");
+        semantico.getTiposAnotados().forEach((nodo, tipo) ->
+                System.out.println("  " + nodo.getClass().getSimpleName()
+                        + " → " + tipo)
+        );
+
+        System.out.println("\n════════════════════════════════════════");
+        System.out.println("  COMPILACIÓN EXITOSA - LISTO PARA CÓDIGO INTERMEDIO");
+        System.out.println("════════════════════════════════════════");
     }
 }
