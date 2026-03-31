@@ -10,9 +10,7 @@ public class TestParserSimple {
                  a = ±√b²−2a / 2c
             """;
 
-        System.out.println("════════════════════════════════════════");
         System.out.println("  COMPILADOR QUETZAL  FASES 1 Y 2");
-        System.out.println("════════════════════════════════════════\n");
 
         System.out.println("CÓDIGO:");
         System.out.println(codigo);
