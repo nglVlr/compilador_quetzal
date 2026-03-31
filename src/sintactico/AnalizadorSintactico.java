@@ -14,27 +14,32 @@ public class AnalizadorSintactico {
     private int               pos;
     private final List<String> errores;
 
-    // Tipos primitivos reconocidos
     private static final List<TipoToken> TIPOS = List.of(
         TipoToken.ENTERO, TipoToken.NUMERO, TipoToken.TEXTO,
         TipoToken.LOG, TipoToken.VACIO
     );
 
+    //aqui reciben la lista de tokens del analizador léxico
     public AnalizadorSintactico(List<Token> tokens) {
-        // Filtrar NUEVA_LINEA para simplificar el parser
+
         this.tokens  = filtrarLineas(tokens);
-        this.pos     = 0;
+        this.pos     = 0; //es un número entero que dice en qué posición de la lista está parado ahora mismo.
+        //aumenta en 1 cada vez que se llama al metodo Consumir() o avanzar()
         this.errores = new ArrayList<>();
     }
 
     // API pública
 
+    //pos es el cursor compartido. Todos los métodos usan el mismo pos.
+    // Entonces por ejemplo cuando parsearSi() consume tokens, el pos avanza.
+    // Cuando termina y devuelve el nodo, el pos ya está apuntando al siguiente token disponible.
+    // eso de pos esta implicito en el metodo consumir porque esta el pos++
     public NodoPrograma analizar() {
         List<Nodo> sentencias = new ArrayList<>();
         while (!finDelArchivo()) {
             try {
-                Nodo s = parsearSentencia();
-                if (s != null) sentencias.add(s);
+                Nodo s = parsearSentencia(); //parsea una sentencia
+                if (s != null) sentencias.add(s); //la agrega a la lista
             } catch (ErrorSintactico e) {
                 errores.add(e.getMessage());
                 sincronizar(); // recuperación de errores: avanza hasta la próxima línea segura
@@ -48,6 +53,8 @@ public class AnalizadorSintactico {
 
     //Sentencias
 
+    //cada if solo mira 1 token para tomar la decisión.
+    // No necesita leer toda la sentencia para saber qué es, con el primer token ya lo sabe.
     private Nodo parsearSentencia() {
         // Módulos
         if (verifica(TipoToken.IMPORTAR)) return parsearImportar();
@@ -82,6 +89,8 @@ public class AnalizadorSintactico {
     }
 
     // IMPORTAR / EXPORTAR
+
+    //importar { sumar, restar } desde "Matematica"
 
     private NodoImportar parsearImportar() {
         int linea = lineaActual();
@@ -146,7 +155,9 @@ public class AnalizadorSintactico {
 
     private NodoDeclaracionVariable parsearDeclaracionVariable(int linea) {
         String tipo   = consumirTipo();
+        //indica si la variable puede cambiar de valor después de ser declarada.
         boolean mutable = false;
+        // si contiene la palabra reservada var se hace mutable, si no, es inmutable (constante)
         if (verifica(TipoToken.VAR)) { consumir(TipoToken.VAR); mutable = true; }
         String nombre = consumir(TipoToken.IDENTIFICADOR).getValor();
         Nodo valor = null;
@@ -206,7 +217,7 @@ public class AnalizadorSintactico {
     // FUNCIONES
 
     private boolean esCabeceraDeFuncion() {
-        // tipo funcion nombre(...)  →  miramos si hay tipo + FUNCION adelante
+        // tipo funcion nombre(...)  --- miramos si hay tipo + FUNCION adelante
         if (!esTipo()) return false;
         int guardado = pos;
         consumirTipo(); // consume el tipo
@@ -318,7 +329,7 @@ public class AnalizadorSintactico {
     private NodoSi parsearSi() {
         int linea = lineaActual();
         consumir(TipoToken.SI);
-        consumir(TipoToken.PAREN_IZQ);
+        consumir(TipoToken.PAREN_IZQ);//la palabra reservada SI va seguida de un parentesis, si no hay, se lanza un error porque es estructura fija
         Nodo condicion = parsearExpresion();
         consumir(TipoToken.PAREN_DER);
         NodoBloque cuerpoIf = parsearBloque();
@@ -771,7 +782,6 @@ public class AnalizadorSintactico {
         return verifica(TipoToken.LISTA) || verifica(TipoToken.JSN);
     }
 
-    /** ¿El identificador actual parece ser un tipo de objeto? Heurística: empieza con mayúscula */
     private boolean esDeclaracionTipoObjeto() {
         String val = actual().getValor();
         return Character.isUpperCase(val.charAt(0)) && verificaSiguiente(TipoToken.IDENTIFICADOR, 1)
@@ -818,7 +828,7 @@ public class AnalizadorSintactico {
     }
 
     private Token consumir(TipoToken tipo) {
-        if (verifica(tipo)) return tokens.get(pos++);
+        if (verifica(tipo)) return tokens.get(pos++); // aqui va atualizando la posicion del token que se esta consumiendo
         Token t = tokenActual();
         throw error("Se esperaba '" + tipo + "' pero se encontró '" + t.getValor()
                 + "' (" + t.getTipo() + ")");
@@ -829,6 +839,11 @@ public class AnalizadorSintactico {
     }
 
     private Token actual() { return tokenActual(); }
+    // si pos está dentro del límite-- devuelve ese token
+    //   si pos se pasó del límite--- devuelve el último token (EOF)
+    //math.min devuelve el número más pequeño entre los dos
+    //por ejemplo si algo falla y poss llega a ser mayor por error que el tamaño de la lista de tokens, en vez de dar error por índice fuera de rango
+    //devulve el numero mas pequeño entre pos y la size de la lista de tokens asi no da error
     private Token tokenActual() { return tokens.get(Math.min(pos, tokens.size() - 1)); }
     private void  avanzar() { if (!finDelArchivo()) pos++; }
     private boolean finDelArchivo() { return pos >= tokens.size() || tokenActual().getTipo() == TipoToken.EOF; }
@@ -854,6 +869,7 @@ public class AnalizadorSintactico {
         while (!finDelArchivo()) {
             TipoToken t = tokenActual().getTipo();
             switch (t) {
+                //estos son los casos de tokens seguros para reanudar el análisis sintáctico después de un error, tokens que pueden iniciar una nueva sentencia o bloque
                 case ENTERO: case NUMERO: case TEXTO: case LOG: case VACIO:
                 case LISTA: case JSN:
                 case SI: case MIENTRAS: case PARA: case HACER:
@@ -862,23 +878,28 @@ public class AnalizadorSintactico {
                 case IMPORTAR: case EXPORTAR:
                     return;
                 default:
-                    avanzar();
+                    avanzar(); // aqui ignora los tokens que estan causando errores para no detener el analisis
             }
         }
     }
 
     /** Filtra tokens NUEVA_LINEA y COMENTARIO para simplificar el parser */
+    //nueva linea es /n como no hay ; entonces ese salto de linea ayuda al lexico pero no es fundamental pera el sintactico
     private List<Token> filtrarLineas(List<Token> original) {
-        List<Token> filtrados = new ArrayList<>();
-        for (Token t : original) {
-            if (t.getTipo() != TipoToken.NUEVA_LINEA
-                && t.getTipo() != TipoToken.COMENTARIO_LINEA
-                && t.getTipo() != TipoToken.COMENTARIO_BLOQUE) {
-                filtrados.add(t);
+        List<Token> filtrados = new ArrayList<>();       // lista vacía nueva
+
+        for (Token t : original) {                       // recorre cada token de la lista y lo asigna a t
+            if (t.getTipo() != TipoToken.NUEVA_LINEA     // si NO es nueva línea
+                    && t.getTipo() != TipoToken.COMENTARIO_LINEA  // Y NO es comentario //
+                    && t.getTipo() != TipoToken.COMENTARIO_BLOQUE) { // Y NO es comentario /* */
+                filtrados.add(t);                        // entonces sí lo agrega
             }
+            // si es cualquiera de esos tres, lo ignora
         }
-        return filtrados;
+
+        return filtrados; // devuelve la lista limpia
     }
+
 
     /**
      * Consume el siguiente token como nombre de campo o método.

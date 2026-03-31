@@ -100,10 +100,6 @@ public class ServidorSintactico {
         System.out.println("\n Endpoints disponibles:");
         System.out.println("   POST http://localhost:" + PUERTO + "/sintactico        (body: JSON)");
         System.out.println("   POST http://localhost:" + PUERTO + "/sintactico/texto  (body: Text)");
-        System.out.println("\n Ejemplo Postman:");
-        System.out.println("   URL:  POST http://localhost:" + PUERTO + "/sintactico/texto");
-        System.out.println("   Body: entero x = 5 + 3");
-        System.out.println("         consola.mostrar(x)");
     }
 
     /**
@@ -141,13 +137,13 @@ public class ServidorSintactico {
 
         // Imprimir el AST si no hay errores
         if (!parser.hayErrores()) {
-            ASTaJSON astJson = new ASTaJSON();
-            String astTexto = ast.aceptar(astJson);
-            resultado.append("    \"ast\": ").append(astTexto).append("\n");
+           // ASTaJSON astJson = new ASTaJSON();
+            //String astTexto = ast.aceptar(astJson);
+            //resultado.append("    \"ast\": ").append(astTexto).append("\n");
            //con estas para el testParserSimple
-            // ImpressorAST impresor = new ImpressorAST();
-            //String astTexto = ast.aceptar(impresor);
-            //resultado.append("    \"ast\": \"").append(escaparJson(astTexto)).append("\"\n");
+            ImpressorAST impresor = new ImpressorAST();
+            String astTexto = ast.aceptar(impresor);
+            resultado.append("    \"ast\": \"").append(escaparJson(astTexto)).append("\"\n");
         } else {
             resultado.append("    \"ast\": null\n");
         }
