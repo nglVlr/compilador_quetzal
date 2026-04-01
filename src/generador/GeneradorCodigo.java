@@ -6,7 +6,6 @@ import sintactico.nodos.*;
 
 import java.util.List;
 import java.util.Map;
-
 /**
  * Fase 4: Generador de Código Java.
  */
