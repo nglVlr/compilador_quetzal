@@ -1,4 +1,5 @@
 package servidor;
+import generador.CompiladorJava;
 import generador.GeneradorCodigo;
 import lexico.*;
 import semantico.AnalizadorSemantico;
@@ -78,7 +79,7 @@ public class TestParserSimple {
             """;
 
         System.out.println("════════════════════════════════════════");
-        System.out.println("  COMPILADOR QUETZAL  FASES 1, 2 Y 3");
+        System.out.println("  COMPILADOR QUETZAL  FASES 1, 2, 3, 4 Y 5");
         System.out.println("════════════════════════════════════════\n");
 
         System.out.println("CÓDIGO:");
@@ -143,8 +144,25 @@ public class TestParserSimple {
         System.out.println("\nFASE 4 - CÓDIGO JAVA GENERADO:");
         System.out.println("---------------------------------------------");
         System.out.println(codigoJava);
-        System.out.println("--------------------------------------");
-        System.out.println("COMPILACIÓN EXITOSA");
+        System.out.println("---------------------------------------------");
+
+        // FASE 5 - COMPILACIÓN A BYTECODE (.class)
+        System.out.println("\nFASE 5 - COMPILACIÓN A BYTECODE:");
+        System.out.println("---------------------------------------------");
+
+        // Carpeta de salida: out/generado/ dentro del directorio de trabajo
+        String carpetaSalida = System.getProperty("user.dir")
+                + java.io.File.separator + "out"
+                + java.io.File.separator + "generado";
+
+        boolean exitoso = CompiladorJava.compilar(codigoJava, carpetaSalida);
+
+        System.out.println("---------------------------------------------");
+        if (exitoso) {
+            System.out.println("COMPILACIÓN EXITOSA - .class listo para JVM");
+        } else {
+            System.out.println("COMPILACIÓN FALLIDA - revisa los errores anteriores");
+        }
         System.out.println("---------------------------------------");
     }
 }
