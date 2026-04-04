@@ -10,71 +10,88 @@ import java.util.*;
 public class TestParserSimple {
     public static void main(String[] args) {
         String codigo = """
-                // Programa de gestión de notas con funciones
+              // Calculadora Interactiva en Quetzal
+                  // Sin palabras reservadas como nombres de variables
                 
-                    // Lista de notas
-                    lista<numero> var notas = [85, 92, 78, 65, 90]
+                  consola.mostrar("CALCULADORA QUETZAL")
                 
-                    // Variables
-                    numero var suma = 0
-                    numero var mayor = 0
-                    numero var menor = 100
-                    entero var cantidad = 0
-                    texto var resultado = ""
+                  // Mostrar menú
+                  consola.mostrar_informacion("Selecciona una operación:")
+                  consola.mostrar("1. Suma")
+                  consola.mostrar("2. Resta")
+                  consola.mostrar("3. Multiplicación")
+                  consola.mostrar("4. División")
+                  consola.mostrar("0. Salir")
                 
-                    // Calcular suma y encontrar mayor y menor
-                    entero var i = 0
-                    mientras (i < 5) {
-                        numero nota_actual = notas.obtener(i)
-                        suma = suma + nota_actual
-                        si (nota_actual > mayor) {
-                            mayor = nota_actual
-                        }
-                        si (nota_actual < menor) {
-                            menor = nota_actual
-                        }
-                        cantidad++
-                        i++
-                    }
+                  // Pedir opción
+                  texto entrada_opcion = consola.pedir("Ingresa el número de operación: ")
                 
-                    // Calcular promedio
-                    numero promedio = suma / cantidad
+                  // Convertir opción
+                  entero var mi_opcion = 0
                 
-                    // Determinar resultado
-                    si (promedio >= 60) {
-                        resultado = "APROBADO"
-                    } sino {
-                        resultado = "REPROBADO"
-                    }
+                  si (entrada_opcion == "0") {
+                      mi_opcion = 0
+                  } sino si (entrada_opcion == "1") {
+                      mi_opcion = 1
+                  } sino si (entrada_opcion == "2") {
+                      mi_opcion = 2
+                  } sino si (entrada_opcion == "3") {
+                      mi_opcion = 3
+                  } sino si (entrada_opcion == "4") {
+                      mi_opcion = 4
+                  }
+                  // Validar
+                  si (mi_opcion < 0 o mi_opcion > 4) {
+                      consola.mostrar_error("Opción inválida")
+                  }
                 
-                    // Mostrar reporte
-                    consola.mostrar_informacion("══════════════════════════")
-                    consola.mostrar_informacion("   REPORTE DE NOTAS")
-                    consola.mostrar_informacion("══════════════════════════")
-                    consola.mostrar(t"Total notas  : {cantidad}")
-                    consola.mostrar(t"Nota mayor   : {mayor}")
-                    consola.mostrar(t"Nota menor   : {menor}")
-                    consola.mostrar(t"Suma total   : {suma}")
-                    consola.mostrar(t"Promedio     : {promedio}")
+                  // Salir
+                  si (mi_opcion == 0) {
+                      consola.mostrar_advertencia("Hasta luego")
+                  }
                 
-                    si (resultado == "APROBADO") {
-                        consola.mostrar_exito(t"Resultado: {resultado}")
-                    } sino {
-                        consola.mostrar_error(t"Resultado: {resultado}")
-                    }
+                  // Pedir números
+                  texto entrada_num1 = consola.pedir("Primer número: ")
+                  texto entrada_num2 = consola.pedir("Segundo número: ")
                 
-                    // Manejo de errores
-                    intentar {
-                        entero var divisor = 0
-                        si (divisor == 0) {
-                            lanzar "Division por cero no permitida"
-                        }
-                        numero division = suma / divisor
-                    } capturar (error) {
-                        consola.mostrar_error("Error capturado correctamente")
-                    } finalmente {
-                        consola.mostrar_informacion("Proceso finalizado")
-                    }
+                  // Convertir texto a número
+                  numero primer_numero = entrada_num1.numero()
+                  numero segundo_numero = entrada_num2.numero()
+                
+                  // Variables resultado
+                  numero var mi_resultado = 0
+                  texto var nombre_op = ""
+                  log var valida = verdadero
+                
+                  // Calcular
+                  si (mi_opcion == 1) {
+                      mi_resultado = primer_numero + segundo_numero
+                      nombre_op = "Suma"
+                  } sino si (mi_opcion == 2) {
+                      mi_resultado = primer_numero - segundo_numero
+                      nombre_op = "Resta"
+                  } sino si (mi_opcion == 3) {
+                      mi_resultado = primer_numero * segundo_numero
+                      nombre_op = "Multiplicación"
+                  } sino si (mi_opcion == 4) {
+                      si (segundo_numero == 0) {
+                          consola.mostrar_error("No se puede dividir por cero")
+                          valida = falso
+                      } sino {
+                          mi_resultado = primer_numero / segundo_numero
+                          nombre_op = "División"
+                      }
+                  }
+                
+                  // Mostrar resultado
+                  si (valida) {
+                      consola.mostrar_exito("RESULTADO:")
+                     \s
+                      texto mensaje = t"{nombre_op} de {primer_numero} y {segundo_numero} = {mi_resultado}"
+                      consola.mostrar(mensaje)
+                     \s
+                  }
+                
                 
             """;
 
@@ -84,7 +101,7 @@ public class TestParserSimple {
 
         System.out.println("CÓDIGO:");
         System.out.println(codigo);
-        System.out.println("\n────────────────────────────────────────");
+        System.out.println("\n───────────────────────────────────────");
 
         // FASE 1 - LÉXICO
         AnalizadorLexico lexer = new AnalizadorLexico(codigo);
@@ -128,13 +145,13 @@ public class TestParserSimple {
         }
         System.out.println("Sin errores");
 
-        // Salida 1: Lista de errores semánticos → ya impresa arriba (ninguno)
+        // Salida 1: Lista de errores semánticos - ya impresa arriba (ninguno)
 
         // Salida 2: AST anotado con tipos
         System.out.println("\nTIPOS ANOTADOS (" + semantico.getTiposAnotados().size() + " nodos):");
         semantico.getTiposAnotados().forEach((nodo, tipo) ->
                 System.out.println("  " + nodo.getClass().getSimpleName()
-                        + " → " + tipo)
+                        + " + " + tipo)
         );
 
         // FASE 4 - GENERADOR DE CÓDIGO

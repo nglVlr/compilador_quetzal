@@ -17,7 +17,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
     // Indica si el programa necesita Scanner para consola.pedir()
     private boolean necesitaScanner = false;
 
-    // ── Helpers de indentación ────────────────────────────────────────────
+    //Helpers de indentación
 
     private String indentar() {
         String resultado = "";
@@ -30,7 +30,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
     private void subirNivel() { nivelIndentacion++; }
     private void bajarNivel() { nivelIndentacion--; }
 
-    // ── Traducción de tipos Quetzal → Java ────────────────────────────────
+    //Traducción de tipos Quetzal - Java
 
     private String traducirTipo(String tipoQuetzal) {
         switch (tipoQuetzal) {
@@ -56,7 +56,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         }
     }
 
-    // ── Programa ─────────────────────────────────────────────────────────
+    // Programa
 
     @Override
     public String visitarPrograma(NodoPrograma n) {
@@ -103,7 +103,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         return sb.toString();
     }
 
-    // ── Declaraciones de variables ────────────────────────────────────────
+    //Declaraciones de variables
 
     @Override
     public String visitarDeclaracionVariable(NodoDeclaracionVariable n) {
@@ -162,7 +162,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         return indentar() + "HashMap<String, Object> " + n.nombre + valor + ";";
     }
 
-    // ── Asignaciones ─────────────────────────────────────────────────────
+    // Asignaciones
 
     @Override
     public String visitarAsignacion(NodoAsignacion n) {
@@ -191,7 +191,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         return indentar() + n.objetivo.aceptar(this) + n.operador + ";";
     }
 
-    // ── Bloque ────────────────────────────────────────────────────────────
+    //Bloque
 
     @Override
     public String visitarBloque(NodoBloque n) {
@@ -209,7 +209,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         return sb.toString();
     }
 
-    // ── Control de flujo ─────────────────────────────────────────────────
+    //Control de flujo
 
     @Override
     public String visitarSi(NodoSi n) {
@@ -267,7 +267,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
 
     @Override
     public String visitarParaEn(NodoParaEn n) {
-        // para elemento en lista → for (int i = 0; i < lista.size(); i++)
+        // para elemento en lista- for (int i = 0; i < lista.size(); i++)
         String coleccion = n.coleccion.aceptar(this);
         StringBuilder sb = new StringBuilder();
         sb.append(indentar()).append("for (int i = 0; i < ")
@@ -305,7 +305,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         return indentar() + "continue;";
     }
 
-    // ── Funciones ─────────────────────────────────────────────────────────
+    // Funciones
 
     @Override
     public String visitarDeclaracionFuncion(NodoDeclaracionFuncion n) {
@@ -347,7 +347,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
             if (i < n.argumentos.size() - 1) args.append(", ");
         }
 
-        // Métodos de conversión Quetzal → Java
+        // Métodos de conversión Quetzal- Java
         switch (n.metodo) {
             case "numero":  return "Double.parseDouble(" + objeto + ")";
             case "entero":  return "Integer.parseInt(" + objeto + ")";
@@ -359,7 +359,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         }
     }
 
-    // ── OOP ───────────────────────────────────────────────────────────────
+    // OOP
 
     @Override
     public String visitarDeclaracionObjeto(NodoDeclaracionObjeto n) {
@@ -442,7 +442,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         return n.coleccion.aceptar(this) + ".get(" + n.indice.aceptar(this) + ")";
     }
 
-    // ── Manejo de errores ─────────────────────────────────────────────────
+    // Manejo de errores
 
     @Override
     public String visitarIntentar(NodoIntentar n) {
@@ -469,7 +469,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
                 + n.expresion.aceptar(this) + "));";
     }
 
-    // ── Módulos ───────────────────────────────────────────────────────────
+    // Módulos
 
     @Override
     public String visitarImportar(NodoImportar n) {
@@ -481,7 +481,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         return indentar() + "// exportar: " + n.simbolos;
     }
 
-    // ── Expresiones ───────────────────────────────────────────────────────
+    //Expresiones
 
     @Override
     public String visitarBinaria(NodoBinaria n) {
@@ -528,7 +528,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
                 + " : " + n.siFalso.aceptar(this);
     }
 
-    // ── Literales ─────────────────────────────────────────────────────────
+    // Literales
 
     @Override
     public String visitarLiteralEntero(NodoLiteralEntero n) {
@@ -587,7 +587,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         return n.nombre;
     }
 
-    // ── Consola ───────────────────────────────────────────────────────────
+    // Consola
 
     @Override
     public String visitarConsola(NodoConsola n) {
@@ -614,7 +614,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         }
     }
 
-    // ── Utilidades internas ───────────────────────────────────────────────
+    // Utilidades internas
 
     /**
      * Genera el bloque { } sin indentación al inicio
@@ -639,7 +639,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
      * Agrega paréntesis a una expresión binaria anidada
      * para respetar la precedencia de operadores.
      * Ej: (nota1 + nota2 + nota3) / 3
-     *  → ((nota1 + nota2) + nota3) / 3
+     *  - ((nota1 + nota2) + nota3) / 3
      */
     private String generarConParentesis(Nodo n) {
         String resultado = n.aceptar(this);
@@ -652,7 +652,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
     /**
      * Quita el punto y coma del final de una sentencia.
      * Se usa para el init y paso del for.
-     * Ej: "int i = 0;" → "int i = 0"
+     * Ej: "int i = 0;" - "int i = 0"
      */
     private String sinPuntoYComa(String sentencia) {
         if (sentencia == null) return "";
@@ -666,7 +666,7 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
     /**
      * Traduce texto interpolado de Quetzal a concatenación Java.
      * t"Hola {nombre}, tienes {edad} años"
-     * → "Hola " + nombre + ", tienes " + edad + " años"
+     * - "Hola " + nombre + ", tienes " + edad + " años"
      */
     private String traducirTextoInterpolado(String plantilla) {
         StringBuilder resultado = new StringBuilder();
