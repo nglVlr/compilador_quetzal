@@ -10,17 +10,23 @@ public class ImpressorAST implements VisitanteNodo<String> {
 
     private int nivel = 0;
 
+    //repeat es un metodo que repite un texto n veces
     private String indentar(String texto) {
         return "  ".repeat(nivel) + texto;
     }
 
     private String hijos(java.util.List<Nodo> nodos) {
         if (nodos == null || nodos.isEmpty()) return "";
+        //aqui sube el nivel de indentacion para que los hijos queden mas a la derecha del padre
         nivel++;
+
         StringBuilder sb = new StringBuilder();
         for (Nodo n : nodos) {
+            //si el nodo es distinto de null se agrega un salto de linea y
+            // se llama al metodo aceptar para que el nodo se imprima con la indentacion correspondiente
             if (n != null) sb.append("\n").append(n.aceptar(this));
         }
+        //se baja el nivel de indentacion para que los hermanos queden al mismo nivel del padre
         nivel--;
         return sb.toString();
     }
@@ -105,6 +111,22 @@ public class ImpressorAST implements VisitanteNodo<String> {
     @Override public String visitarRomper(NodoRomper n)     { return indentar("Romper"); }
     @Override public String visitarContinuar(NodoContinuar n) { return indentar("Continuar"); }
 
+
+    /**
+     * Convierte una declaración de función en texto legible para el testparser.
+     *
+     *   n.parametros.stream() convierte la lista de parámetros en un flujo para procesarlos es mas breve que un for
+     *
+     *   .map(p -> p.tipo + " " + p.nombre)transforma cada parámetro a texto: Parametro(entero,a) - "entero a"
+     *
+     *   .reduce((a, b) -> a + ", " + b) une todos los textos con coma: "entero a" + "entero b" - "entero a, entero b"
+     *
+     *   .orElse("") si no hay parámetros devuelve texto vacío
+
+     *   indentar(...)  - agrega espacios según el nivel de profundidad
+     *   n.esAsync      - si es async agrega "(async)" al nombre
+     *   hijo(n.cuerpo) - imprime el cuerpo de la función indentado debajo
+     */
     @Override public String visitarDeclaracionFuncion(NodoDeclaracionFuncion n) {
         String params = n.parametros.stream()
             .map(p -> p.tipo + " " + p.nombre)
@@ -124,8 +146,12 @@ public class ImpressorAST implements VisitanteNodo<String> {
     @Override public String visitarDeclaracionObjeto(NodoDeclaracionObjeto n) {
         StringBuilder sb = new StringBuilder(indentar("Objeto " + n.nombre));
         nivel++;
+
+        // el string builder primero inicia solo con objeto y el nombre, y luego sube de nivel para la indentacion
+        //y va agregando si tiene privado y eso y ahí mismo se va llamando para indentar lo que tenga dentro
         if (!n.atributosPrivados.isEmpty()) {
             sb.append("\n").append(indentar("privado:"));
+            //para cada NodoDeclaracionVariable llamado a en la lista atributosPrivados
             for (NodoDeclaracionVariable a : n.atributosPrivados) sb.append(hijo(a));
         }
         if (n.constructor != null) {
@@ -194,6 +220,7 @@ public class ImpressorAST implements VisitanteNodo<String> {
         StringBuilder sb = new StringBuilder(indentar("JsnLit"));
         nivel++;
         for (var e : n.pares.entrySet()) {
+            //la llave seria "nombre por ejemplo" y la clave es "maria" asi se va guardando como hashmap con clave y valor
             sb.append("\n").append(indentar(e.getKey() + ":")).append(hijo(e.getValue()));
         }
         nivel--;

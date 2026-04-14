@@ -19,7 +19,7 @@ public class AnalizadorSintactico {
         TipoToken.LOG, TipoToken.VACIO
     );
 
-    //aqui reciben la lista de tokens del analizador léxico
+    //aqui reciben la lista de tokens filtrados ya sin saltos de linea y comentarios
     public AnalizadorSintactico(List<Token> tokens) {
 
         this.tokens  = filtrarLineas(tokens);
@@ -91,7 +91,8 @@ public class AnalizadorSintactico {
     // IMPORTAR / EXPORTAR
 
     //importar { sumar, restar } desde "Matematica"
-
+    //los simbolos son  lista de nombres que se quieren importar
+    // y la ruta es el nombre de archivo de donde se van a importar, sería una clase
     private NodoImportar parsearImportar() {
         int linea = lineaActual();
         consumir(TipoToken.IMPORTAR);
@@ -108,6 +109,7 @@ public class AnalizadorSintactico {
         return new NodoImportar(linea, simbolos, ruta);
     }
 
+    //el exportar son por ejemplo desde matematica solo suma y resta es visible para *la ruta* osea el archivo donde se quiere usar
     private NodoExportar parsearExportar() {
         int linea = lineaActual();
         consumir(TipoToken.EXPORTAR);
@@ -770,7 +772,6 @@ public class AnalizadorSintactico {
         return args;
     }
 
-    // Utilidades del parser
 
     private boolean esTipo() {
         return TIPOS.contains(tokenActual().getTipo());
@@ -844,6 +845,7 @@ public class AnalizadorSintactico {
     //math.min devuelve el número más pequeño entre los dos
     //por ejemplo si algo falla y poss llega a ser mayor por error que el tamaño de la lista de tokens, en vez de dar error por índice fuera de rango
     //devulve el numero mas pequeño entre pos y la size de la lista de tokens asi no da error
+
     private Token tokenActual() { return tokens.get(Math.min(pos, tokens.size() - 1)); }
     private void  avanzar() { if (!finDelArchivo()) pos++; }
     private boolean finDelArchivo() { return pos >= tokens.size() || tokenActual().getTipo() == TipoToken.EOF; }

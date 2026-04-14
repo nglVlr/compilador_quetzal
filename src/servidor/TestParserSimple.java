@@ -7,115 +7,162 @@ import sintactico.*;
 import sintactico.nodos.*;
 import java.util.*;
 
+
 public class TestParserSimple {
     public static void main(String[] args) {
         String codigo = """
-              // Calculadora Interactiva en Quetzal
-                  // Sin palabras reservadas como nombres de variables
-                
-                  consola.mostrar("CALCULADORA QUETZAL")
-                
-                  // Mostrar menú
-                  consola.mostrar_informacion("Selecciona una operación:")
-                  consola.mostrar("1. Suma")
-                  consola.mostrar("2. Resta")
-                  consola.mostrar("3. Multiplicación")
-                  consola.mostrar("4. División")
-                  consola.mostrar("0. Salir")
-                
-                  // Pedir opción
-                  texto entrada_opcion = consola.pedir("Ingresa el número de operación: ")
-                
-                  // Convertir opción
-                  entero var mi_opcion = 0
-                
-                  si (entrada_opcion == "0") {
-                      mi_opcion = 0
-                  } sino si (entrada_opcion == "1") {
-                      mi_opcion = 1
-                  } sino si (entrada_opcion == "2") {
-                      mi_opcion = 2
-                  } sino si (entrada_opcion == "3") {
-                      mi_opcion = 3
-                  } sino si (entrada_opcion == "4") {
-                      mi_opcion = 4
-                  }
-                  // Validar
-                  si (mi_opcion < 0 o mi_opcion > 4) {
-                      consola.mostrar_error("Opción inválida")
-                  }
-                
-                  // Salir
-                  si (mi_opcion == 0) {
-                      consola.mostrar_advertencia("Hasta luego")
-                  }
-                
-                  // Pedir números
-                  texto entrada_num1 = consola.pedir("Primer número: ")
-                  texto entrada_num2 = consola.pedir("Segundo número: ")
-                
-                  // Convertir texto a número
-                  numero primer_numero = entrada_num1.numero()
-                  numero segundo_numero = entrada_num2.numero()
-                
-                  // Variables resultado
-                  numero var mi_resultado = 0
-                  texto var nombre_op = ""
-                  log var valida = verdadero
-                
-                  // Calcular
-                  si (mi_opcion == 1) {
-                      mi_resultado = primer_numero + segundo_numero
-                      nombre_op = "Suma"
-                  } sino si (mi_opcion == 2) {
-                      mi_resultado = primer_numero - segundo_numero
-                      nombre_op = "Resta"
-                  } sino si (mi_opcion == 3) {
-                      mi_resultado = primer_numero * segundo_numero
-                      nombre_op = "Multiplicación"
-                  } sino si (mi_opcion == 4) {
-                      si (segundo_numero == 0) {
-                          consola.mostrar_error("No se puede dividir por cero")
-                          valida = falso
-                      } sino {
-                          mi_resultado = primer_numero / segundo_numero
-                          nombre_op = "División"
-                      }
-                  }
-                
-                  // Mostrar resultado
-                  si (valida) {
-                      consola.mostrar_exito("RESULTADO:")
-                     \s
-                      texto mensaje = t"{nombre_op} de {primer_numero} y {segundo_numero} = {mi_resultado}"
-                      consola.mostrar(mensaje)
-                     \s
-                  }
-                
-                
-            """;
+                jsn var formulario = {
+                    id: "registro_usuario_2026",
+                    titulo: "Formulario de Registro Complejo",
+                    descripcion: "Captura de información personal, laboral y preferencias",
+                    secciones: [
+                        {
+                            nombre: "Datos Personales",
+                            campos: [
+                                {
+                                    id: "nombre",
+                                    tipo: "texto",
+                                    etiqueta: "Nombre completo",
+                                    validaciones: {
+                                        requerido: verdadero,
+                                        longitud_minima: 3,
+                                        longitud_maxima: 100
+                                    }
+                                },
+                                {
+                                    id: "fecha_nacimiento",
+                                    tipo: "fecha",
+                                    etiqueta: "Fecha de nacimiento",
+                                    validaciones: {
+                                        requerido: verdadero,
+                                        formato: "YYYY-MM-DD",
+                                        rango: {
+                                            min: "1900-01-01",
+                                            max: "2026-12-31"
+                                        }
+                                    }
+                                },
+                                {
+                                    id: "genero",
+                                    tipo: "seleccion",
+                                    etiqueta: "Género",
+                                    opciones: ["Masculino", "Femenino", "Otro", "Prefiero no decir"],
+                                    validaciones: {
+                                        requerido: verdadero
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            nombre: "Información Laboral",
+                            campos: [
+                                {
+                                    id: "empresa",
+                                    tipo: "texto",
+                                    etiqueta: "Nombre de la empresa",
+                                    validaciones: {
+                                        requerido: falso
+                                    }
+                                },
+                                {
+                                    id: "puesto",
+                                    tipo: "texto",
+                                    etiqueta: "Puesto de trabajo",
+                                    validaciones: {
+                                        requerido: falso
+                                    }
+                                },
+                                {
+                                    id: "salario",
+                                    tipo: "numero",
+                                    etiqueta: "Salario mensual",
+                                    validaciones: {
+                                        requerido: falso,
+                                        min: 0,
+                                        max: 100000
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            nombre: "Preferencias",
+                            campos: [
+                                {
+                                    id: "suscripcion",
+                                    tipo: "booleano",
+                                    etiqueta: "¿Desea recibir noticias por correo?",
+                                    validaciones: {
+                                        requerido: verdadero
+                                    }
+                                },
+                                {
+                                    id: "intereses",
+                                    tipo: "lista",
+                                    etiqueta: "Áreas de interés",
+                                    opciones: ["Tecnología", "Deportes", "Arte", "Ciencia", "Viajes"],
+                                    validaciones: {
+                                        requerido: falso,
+                                        max_selecciones: 3
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    metadatos: {
+                        version: "1.0",
+                        creado_por: "Sistema Central",
+                        fecha_creacion: "2026-04-11"
+                    }
+                }
+                """;
 
         System.out.println("════════════════════════════════════════");
-        System.out.println("  COMPILADOR QUETZAL  FASES 1, 2, 3, 4 Y 5");
+        System.out.println("  COMPILADOR QUETZAL  FASES 1 Y 2");
         System.out.println("════════════════════════════════════════\n");
 
         System.out.println("CÓDIGO:");
         System.out.println(codigo);
-        System.out.println("\n───────────────────────────────────────");
+        System.out.println("\n────────────────────────────────────────");
 
         // FASE 1 - LÉXICO
         AnalizadorLexico lexer = new AnalizadorLexico(codigo);
         List<Token> tokens = lexer.analizar();
 
+
+        int total = 0;
+        for (Token t : tokens) {
+            if (t.getTipo() != TipoToken.EOF && t.getTipo() != TipoToken.NUEVA_LINEA) {
+                total++;
+            }
+        }
+
         System.out.println("\nFASE 1 - LÉXICO:");
-        System.out.println("Tokens: " + (tokens.size() - 1));
+        System.out.println("Total Tokens: " + total);
 
         if (lexer.hayErrores()) {
             System.out.println("ERRORES:");
             lexer.getErrores().forEach(System.out::println);
             return;
         }
-        System.out.println("Sin errores");
+        System.out.println("Sin errores\n");
+
+        // Imprimir tabla de tokens
+        System.out.println("────────────────────────────────────────────────────────────────────────");
+        System.out.printf("%-5s %-30s %-30s %-8s %-8s%n",
+                "Núm", "Tipo", "Valor", "Línea", "Columna");
+        System.out.println("────────────────────────────────────────────────────────────────────────");
+
+        int num = 1;
+        for (Token t : tokens) {
+            if (t.getTipo() == TipoToken.EOF || t.getTipo() == TipoToken.NUEVA_LINEA) continue;
+            System.out.printf("%-5d %-30s %-30s %-8d %-8d%n",
+                    num++,
+                    clasificar(t.getTipo()),
+                    t.getValor(),
+                    t.getLinea(),
+                    t.getColumna());
+        }
+        System.out.println("────────────────────────────────────────────────────────────────────────");
 
         // FASE 2 - SINTÁCTICO
         AnalizadorSintactico parser = new AnalizadorSintactico(tokens);
@@ -132,6 +179,7 @@ public class TestParserSimple {
         System.out.println("\nAST:");
         ImpressorAST imp = new ImpressorAST();
         System.out.println(ast.aceptar(imp));
+
 
         // FASE 3 - SEMÁNTICO
         AnalizadorSemantico semantico = new AnalizadorSemantico();
@@ -181,5 +229,53 @@ public class TestParserSimple {
             System.out.println("COMPILACIÓN FALLIDA - revisa los errores anteriores");
         }
         System.out.println("---------------------------------------");
+
+    }
+
+    private static String clasificar(TipoToken tipo) {
+        switch (tipo) {
+            case ENTERO: case NUMERO: case TEXTO: case LOG: case VACIO:
+            case LISTA: case JSN: case VAR:
+            case SI: case SINO: case SINO_SI: case MIENTRAS: case PARA:
+            case EN: case HACER: case RETORNAR: case ROMPER: case CONTINUAR:
+            case FUNCION: case ASYNC: case ESPERAR:
+            case OBJETO: case NUEVO: case AMBIENTE: case PRIVADO: case PUBLICO: case ESTATICO:
+            case IMPORTAR: case EXPORTAR: case DESDE:
+            case INTENTAR: case CAPTURAR: case FINALMENTE: case LANZAR:
+            case VERDADERO: case FALSO: case NULO:
+            case Y: case O: case NO:
+                return "Palabra Reservada";
+            case IDENTIFICADOR:
+                return "Identificador";
+            case LITERAL_ENTERO:
+                return "Literal Entero";
+            case LITERAL_REAL:
+                return "Literal Flotante";
+            case LITERAL_TEXTO:
+                return "Literal String";
+            case LITERAL_TEXTO_INTERP:
+                return "Literal String Interpolado";
+            case OP_SUMA: case OP_RESTA: case OP_MULT: case OP_DIV: case OP_MOD:
+            case OP_INCREMENTO: case OP_DECREMENTO:
+                return "Operador Aritmetico";
+            case OP_IGUAL: case OP_DIFERENTE:
+            case OP_MENOR: case OP_MAYOR: case OP_MENOR_IGUAL: case OP_MAYOR_IGUAL:
+                return "Operador Relacional";
+            case OP_AND: case OP_OR: case OP_NOT:
+                return "Operador Logico";
+            case OP_ASIGNACION:
+            case OP_SUMA_ASIG: case OP_RESTA_ASIG:
+            case OP_MULT_ASIG: case OP_DIV_ASIG: case OP_MOD_ASIG:
+                return "Operador Asignacion";
+            case INTERROGACION:
+                return "Operador Ternario";
+            case PAREN_IZQ: case PAREN_DER:
+            case LLAVE_IZQ: case LLAVE_DER:
+            case CORCHETE_IZQ: case CORCHETE_DER:
+            case PUNTO: case COMA: case DOS_PUNTOS: case PUNTO_COMA:
+                return "Delimitador";
+            default:
+                return "Desconocido";
+        }
     }
 }
