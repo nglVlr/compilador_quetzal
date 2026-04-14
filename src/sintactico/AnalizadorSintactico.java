@@ -170,12 +170,26 @@ public class AnalizadorSintactico {
         return new NodoDeclaracionVariable(linea, tipo, mutable, nombre, valor);
     }
 
+    private String consumirTipoCompleto() {
+        if (verifica(TipoToken.LISTA)) {
+            consumir(TipoToken.LISTA);
+            if (verifica(TipoToken.OP_MENOR)) {
+                consumir(TipoToken.OP_MENOR);
+                String tipoInterno = consumirTipoCompleto(); // recursivo
+                consumir(TipoToken.OP_MAYOR);
+                return "lista<" + tipoInterno + ">";
+            }
+            return "lista";
+        }
+        return consumirTipo(); // para entero, numero, texto, log, vacio
+    }
+
     private NodoDeclaracionLista parsearDeclaracionLista(int linea) {
         consumir(TipoToken.LISTA);
         String tipoElemento = null;
         if (verifica(TipoToken.OP_MENOR)) {
             consumir(TipoToken.OP_MENOR);
-            tipoElemento = consumirTipo();
+            tipoElemento = consumirTipoCompleto();
             consumir(TipoToken.OP_MAYOR);
         }
         boolean mutable = false;

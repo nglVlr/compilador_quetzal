@@ -11,109 +11,29 @@ import java.util.*;
 public class TestParserSimple {
     public static void main(String[] args) {
         String codigo = """
-                jsn var formulario = {
-                    id: "registro_usuario_2026",
-                    titulo: "Formulario de Registro Complejo",
-                    descripcion: "Captura de información personal, laboral y preferencias",
-                    secciones: [
-                        {
-                            nombre: "Datos Personales",
-                            campos: [
-                                {
-                                    id: "nombre",
-                                    tipo: "texto",
-                                    etiqueta: "Nombre completo",
-                                    validaciones: {
-                                        requerido: verdadero,
-                                        longitud_minima: 3,
-                                        longitud_maxima: 100
-                                    }
-                                },
-                                {
-                                    id: "fecha_nacimiento",
-                                    tipo: "fecha",
-                                    etiqueta: "Fecha de nacimiento",
-                                    validaciones: {
-                                        requerido: verdadero,
-                                        formato: "YYYY-MM-DD",
-                                        rango: {
-                                            min: "1900-01-01",
-                                            max: "2026-12-31"
-                                        }
-                                    }
-                                },
-                                {
-                                    id: "genero",
-                                    tipo: "seleccion",
-                                    etiqueta: "Género",
-                                    opciones: ["Masculino", "Femenino", "Otro", "Prefiero no decir"],
-                                    validaciones: {
-                                        requerido: verdadero
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            nombre: "Información Laboral",
-                            campos: [
-                                {
-                                    id: "empresa",
-                                    tipo: "texto",
-                                    etiqueta: "Nombre de la empresa",
-                                    validaciones: {
-                                        requerido: falso
-                                    }
-                                },
-                                {
-                                    id: "puesto",
-                                    tipo: "texto",
-                                    etiqueta: "Puesto de trabajo",
-                                    validaciones: {
-                                        requerido: falso
-                                    }
-                                },
-                                {
-                                    id: "salario",
-                                    tipo: "numero",
-                                    etiqueta: "Salario mensual",
-                                    validaciones: {
-                                        requerido: falso,
-                                        min: 0,
-                                        max: 100000
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            nombre: "Preferencias",
-                            campos: [
-                                {
-                                    id: "suscripcion",
-                                    tipo: "booleano",
-                                    etiqueta: "¿Desea recibir noticias por correo?",
-                                    validaciones: {
-                                        requerido: verdadero
-                                    }
-                                },
-                                {
-                                    id: "intereses",
-                                    tipo: "lista",
-                                    etiqueta: "Áreas de interés",
-                                    opciones: ["Tecnología", "Deportes", "Arte", "Ciencia", "Viajes"],
-                                    validaciones: {
-                                        requerido: falso,
-                                        max_selecciones: 3
-                                    }
-                                }
-                            ]
-                        }
-                    ],
-                    metadatos: {
-                        version: "1.0",
-                        creado_por: "Sistema Central",
-                        fecha_creacion: "2026-04-11"
+                lista<lista<entero>> var matriz = [
+                    [1, 2, 3],
+                    [4, 5, 6],
+                    [7, 8, 9]
+                ]
+                
+                consola.mostrar_informacion("══════════════════════════")
+                consola.mostrar_informacion("   MATRIZ 3x3")
+                consola.mostrar_informacion("══════════════════════════")
+                
+                entero var fila = 0
+                mientras (fila < 3) {
+                    lista<entero> fila_actual = matriz.obtener(fila)
+                    entero var col = 0
+                    mientras (col < 3) {
+                        entero valor = fila_actual.obtener(col)
+                        consola.mostrar(t"matriz[{fila}][{col}] = {valor}")
+                        col++
                     }
+                    fila++
                 }
+                
+                consola.mostrar_exito("Matriz recorrida exitosamente")
                 """;
 
         System.out.println("════════════════════════════════════════");

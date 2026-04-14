@@ -147,7 +147,10 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
 
         if (n.valor != null) {
             String tipoValor = n.valor.aceptar(this);
-            if (!tipoValor.equals(TIPO_DESCONOCIDO) && !tipoValor.equals("lista") && !tipoValor.equals("nulo")) {
+            if (!tipoValor.equals(TIPO_DESCONOCIDO)
+                    && !tipoValor.equals("lista")
+                    && !tipoValor.startsWith("lista<")
+                    && !tipoValor.equals("nulo")) {
                 registrarError(
                         "Se esperaba una lista para '" + n.nombre + "' pero se encontró '" + tipoValor + "'.",
                         n.linea

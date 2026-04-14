@@ -47,12 +47,21 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
 
     private String traducirTipoLista(String tipoElemento) {
         if (tipoElemento == null) return "ArrayList<Object>";
-        switch (tipoElemento) {
-            case "entero": return "ArrayList<Integer>";
-            case "numero": return "ArrayList<Double>";
-            case "texto":  return "ArrayList<String>";
-            case "log":    return "ArrayList<Boolean>";
-            default:       return "ArrayList<Object>";
+        return "ArrayList<" + traducirTipoElemento(tipoElemento) + ">";
+    }
+
+    private String traducirTipoElemento(String tipo) {
+        switch (tipo) {
+            case "entero": return "Integer";
+            case "numero": return "Double";
+            case "texto":  return "String";
+            case "log":    return "Boolean";
+            default:
+                if (tipo.startsWith("lista<")) {
+                    String interno = tipo.substring(6, tipo.length() - 1);
+                    return "ArrayList<" + traducirTipoElemento(interno) + ">";
+                }
+                return "Object";
         }
     }
 
@@ -107,9 +116,18 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
 
     @Override
     public String visitarDeclaracionVariable(NodoDeclaracionVariable n) {
+
+        if (n.tipo.startsWith("lista<") && n.valor != null
+                && !(n.valor instanceof NodoLiteralLista)) {
+            String tipoInterno = n.tipo.substring(6, n.tipo.length() - 1);
+            String tipoJava = traducirTipoLista(tipoInterno);
+            return indentar() + tipoJava + " " + n.nombre
+                    + " = " + n.valor.aceptar(this) + ";";
+        }
         String tipoJava = traducirTipo(n.tipo);
         String prompt   = "";
         String valor    = "";
+
 
         if (n.valor instanceof NodoConsola) {
             NodoConsola consola = (NodoConsola) n.valor;
@@ -129,28 +147,52 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
 
     @Override
     public String visitarDeclaracionLista(NodoDeclaracionLista n) {
+
+        if (n.valor != null && !(n.valor instanceof NodoLiteralLista)) {
+            String tipoJava = traducirTipoLista(n.tipoElemento);
+            return indentar() + tipoJava + " " + n.nombre
+                    + " = " + n.valor.aceptar(this) + ";";
+        }
+
         String tipoJava = traducirTipoLista(n.tipoElemento);
         StringBuilder sb = new StringBuilder();
-
-        // Declaración vacía
         sb.append(indentar()).append(tipoJava).append(" ")
                 .append(n.nombre).append(" = new ArrayList<>();");
 
-        // Agregar elementos con .add()
         if (n.valor instanceof NodoLiteralLista) {
             NodoLiteralLista lista = (NodoLiteralLista) n.valor;
             for (int i = 0; i < lista.elementos.size(); i++) {
-                String elem = lista.elementos.get(i).aceptar(this);
-                // Si el tipo es numero y el elemento es entero, agregar .0
-                if ("numero".equals(n.tipoElemento) &&
-                        lista.elementos.get(i) instanceof NodoLiteralEntero) {
-                    elem = elem + ".0";
+                Nodo elem = lista.elementos.get(i);
+
+                // Si el elemento es otra lista - crear sublista y agregarla
+                if (elem instanceof NodoLiteralLista) {
+                    String nombreSub = n.nombre + "_fila" + i;
+                    String tipoInterno = n.tipoElemento != null
+                            && n.tipoElemento.startsWith("lista<")
+                            ? traducirTipoLista(n.tipoElemento.substring(6, n.tipoElemento.length() - 1))
+                            : "ArrayList<Object>";
+
+                    sb.append("\n").append(indentar())
+                            .append(tipoInterno).append(" ").append(nombreSub)
+                            .append(" = new ArrayList<>();");
+
+                    NodoLiteralLista subLista = (NodoLiteralLista) elem;
+                    for (int j = 0; j < subLista.elementos.size(); j++) {
+                        String elemVal = subLista.elementos.get(j).aceptar(this);
+                        sb.append("\n").append(indentar())
+                                .append(nombreSub).append(".add(").append(elemVal).append(");");
+                    }
+                    sb.append("\n").append(indentar())
+                            .append(n.nombre).append(".add(").append(nombreSub).append(");");
+
+                } else {
+                    // Elemento simple
+                    String elemVal = elem.aceptar(this);
+                    sb.append("\n").append(indentar())
+                            .append(n.nombre).append(".add(").append(elemVal).append(");");
                 }
-                sb.append("\n").append(indentar())
-                        .append(n.nombre).append(".add(").append(elem).append(");");
             }
         }
-
         return sb.toString();
     }
 
