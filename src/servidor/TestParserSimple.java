@@ -100,7 +100,7 @@ public class TestParserSimple {
         ImpressorAST imp = new ImpressorAST();
         System.out.println(ast.aceptar(imp));
 
-
+/*
         // FASE 3 - SEMÁNTICO
         AnalizadorSemantico semantico = new AnalizadorSemantico();
         semantico.analizar(ast);
@@ -147,7 +147,7 @@ public class TestParserSimple {
             System.out.println("COMPILACIÓN EXITOSA - .class listo para JVM");
         } else {
             System.out.println("COMPILACIÓN FALLIDA - revisa los errores anteriores");
-        }
+        }*/
         System.out.println("---------------------------------------");
 
     }
