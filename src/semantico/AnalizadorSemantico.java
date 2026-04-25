@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 public class AnalizadorSemantico implements VisitanteNodo<String> {
-    // ── Tipo especial para errores ────────────────────────────────────────
+    // Tipo especial para errores
     private static final String TIPO_DESCONOCIDO = "desconocido";
 
-    // ── Infraestructura ───────────────────────────────────────────────────
+    //Infraestructura
     private final TablaSimbolos tabla;
     private final List<ErrorSemantico> errores;
 
@@ -23,7 +23,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
      */
     private final Map<Nodo, String> tiposAnotados;
 
-    // ── Estado de contexto durante el recorrido ───────────────────────────
+    //  Estado de contexto durante el recorrido
 
     /** Tipo de retorno de la función que se está analizando actualmente. */
     private String tipoRetornoFuncionActual;
@@ -34,7 +34,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
     /** Indica si actualmente se está dentro de un objeto. */
     private String nombreObjetoActual;
 
-    // ── Constructor ───────────────────────────────────────────────────────
+    // Constructor
 
     public AnalizadorSemantico() {
         this.tabla                    = new TablaSimbolos();
@@ -45,7 +45,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         this.nombreObjetoActual       = null;
     }
 
-    // ── API pública ───────────────────────────────────────────────────────
+    //API pública
 
     /**
      * Punto de entrada del análisis semántico.
@@ -60,7 +60,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
     public Map<Nodo, String> getTiposAnotados()   { return tiposAnotados; }
     public TablaSimbolos getTabla()               { return tabla; }
 
-    // ── Utilidades internas ───────────────────────────────────────────────
+    // Utilidades internas
 
     /**
      * Registra el tipo inferido de un nodo en el mapa de anotaciones
@@ -88,7 +88,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return false;
     }
 
-    // ── Programa ──────────────────────────────────────────────────────────
+    // Programa
 
     @Override
     public String visitarPrograma(NodoPrograma n) {
@@ -98,7 +98,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return anotar(n, TIPO_DESCONOCIDO);
     }
 
-    // ── Declaraciones de variables ────────────────────────────────────────
+    // Declaraciones de variables
 
     @Override
     public String visitarDeclaracionVariable(NodoDeclaracionVariable n) {
@@ -147,7 +147,10 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
 
         if (n.valor != null) {
             String tipoValor = n.valor.aceptar(this);
-            if (!tipoValor.equals(TIPO_DESCONOCIDO) && !tipoValor.equals("lista") && !tipoValor.equals("nulo")) {
+            if (!tipoValor.equals(TIPO_DESCONOCIDO)
+                    && !tipoValor.equals("lista")
+                    && !tipoValor.startsWith("lista<")
+                    && !tipoValor.equals("nulo")) {
                 registrarError(
                         "Se esperaba una lista para '" + n.nombre + "' pero se encontró '" + tipoValor + "'.",
                         n.linea
@@ -191,7 +194,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return anotar(n, "jsn");
     }
 
-    // ── Asignación ────────────────────────────────────────────────────────
+    // Asignación
 
     @Override
     public String visitarAsignacion(NodoAsignacion n) {
@@ -282,7 +285,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return anotar(n, tipo);
     }
 
-    // ── Bloque ────────────────────────────────────────────────────────────
+    // Bloque
 
     @Override
     public String visitarBloque(NodoBloque n) {
@@ -292,7 +295,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return TIPO_DESCONOCIDO;
     }
 
-    // ── Control de flujo ──────────────────────────────────────────────────
+    // Control de flujo
 
     @Override
     public String visitarSi(NodoSi n) {
@@ -476,7 +479,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return TIPO_DESCONOCIDO;
     }
 
-    // ── Funciones ─────────────────────────────────────────────────────────
+    // Funciones
 
     @Override
     public String visitarDeclaracionFuncion(NodoDeclaracionFuncion n) {
@@ -587,7 +590,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return TIPO_DESCONOCIDO;
     }
 
-    // ── Objetos ───────────────────────────────────────────────────────────
+    // Objetos
 
     @Override
     public String visitarDeclaracionObjeto(NodoDeclaracionObjeto n) {
@@ -694,7 +697,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return TIPO_DESCONOCIDO;
     }
 
-    // ── Manejo de errores ─────────────────────────────────────────────────
+    // Manejo de errores
 
     @Override
     public String visitarIntentar(NodoIntentar n) {
@@ -731,7 +734,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return TIPO_DESCONOCIDO;
     }
 
-    // ── Módulos ───────────────────────────────────────────────────────────
+    // Módulos
 
     @Override
     public String visitarImportar(NodoImportar n) {
@@ -763,7 +766,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return TIPO_DESCONOCIDO;
     }
 
-    // ── Expresiones binarias y unarias ────────────────────────────────────
+    // Expresiones binarias y unarias
 
     @Override
     public String visitarBinaria(NodoBinaria n) {
@@ -888,7 +891,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return anotar(n, TIPO_DESCONOCIDO);
     }
 
-    // ── Literales ─────────────────────────────────────────────────────────
+    // Literales
 
     @Override public String visitarLiteralEntero(NodoLiteralEntero n)   { return anotar(n, "entero"); }
     @Override public String visitarLiteralReal(NodoLiteralReal n)       { return anotar(n, "numero"); }
@@ -909,7 +912,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         return anotar(n, "jsn");
     }
 
-    // ── Identificador y consola ───────────────────────────────────────────
+    // Identificador y consola
 
     @Override
     public String visitarIdentificador(NodoIdentificador n) {
@@ -944,10 +947,10 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
             arg.aceptar(this);
         }
         // Métodos de consola que retornan un valor según la documentación de Quetzal:
-        // pedir()        → texto  (lee entrada del usuario como texto)
-        // pedir_entero() → entero
-        // pedir_numero() → numero
-        // Todos los demás (mostrar, mostrar_error, etc.) → vacio
+        // pedir()        - texto  (lee entrada del usuario como texto)
+        // pedir_entero() - entero
+        // pedir_numero() - numero
+        // Todos los demás (mostrar, mostrar_error, etc.) - vacio
         switch (n.metodo) {
             case "pedir":         return anotar(n, "texto");
             case "pedir_entero":  return anotar(n, "entero");
@@ -956,7 +959,7 @@ public class AnalizadorSemantico implements VisitanteNodo<String> {
         }
     }
 
-    // ── Utilidades de tipos ───────────────────────────────────────────────
+    // Utilidades de tipos
 
     /** Indica si un tipo es numérico (entero o numero). */
     private boolean esNumerico(String tipo) {

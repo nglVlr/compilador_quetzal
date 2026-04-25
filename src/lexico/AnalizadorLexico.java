@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class AnalizadorLexico {
 
-    // ── Tabla de palabras reservadas
+    // Tabla de palabras reservadas
     private static final Map<String, TipoToken> PALABRAS_RESERVADAS = new HashMap<>();
 
     static {
