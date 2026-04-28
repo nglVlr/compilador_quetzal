@@ -233,11 +233,13 @@ public class AnalizadorSintactico {
     // FUNCIONES
 
     private boolean esCabeceraDeFuncion() {
-        // tipo funcion nombre(...)  --- miramos si hay tipo + FUNCION adelante
+        // Patrón: tipo identificador (
         if (!esTipo()) return false;
         int guardado = pos;
-        consumirTipo(); // consume el tipo
-        boolean esFun = verifica(TipoToken.FUNCION);
+        consumirTipo();                                    // consume el tipo
+        if (!verifica(TipoToken.IDENTIFICADOR)) { pos = guardado; return false; }
+        pos++;                                             // consume el nombre
+        boolean esFun = verifica(TipoToken.PAREN_IZQ);    // debe seguir '('
         pos = guardado;
         return esFun;
     }
@@ -246,7 +248,7 @@ public class AnalizadorSintactico {
         int linea = lineaActual();
         String tipoRetorno = "vacio";
         if (esTipo()) tipoRetorno = consumirTipo();
-        consumir(TipoToken.FUNCION);
+        // No se consume 'funcion' — la sintaxis es: tipo nombre(params) { }
         String nombre = consumir(TipoToken.IDENTIFICADOR).getValor();
         List<NodoDeclaracionFuncion.Parametro> params = parsearParametros();
         NodoBloque cuerpo = parsearBloque();

@@ -11,29 +11,9 @@ import java.util.*;
 public class TestParserSimple {
     public static void main(String[] args) {
         String codigo = """
-                lista<lista<entero>> var matriz = [
-                    [1, 2, 3],
-                    [4, 5, 6],
-                    [7, 8, 9]
-                ]
-                
-                consola.mostrar_informacion("══════════════════════════")
-                consola.mostrar_informacion("   MATRIZ 3x3")
-                consola.mostrar_informacion("══════════════════════════")
-                
-                entero var fila = 0
-                mientras (fila < 3) {
-                    lista<entero> fila_actual = matriz.obtener(fila)
-                    entero var col = 0
-                    mientras (col < 3) {
-                        entero valor = fila_actual.obtener(col)
-                        consola.mostrar(t"matriz[{fila}][{col}] = {valor}")
-                        col++
-                    }
-                    fila++
+                para (entero i=0; i<10; i++){
+                entero suma=suma+i
                 }
-                
-                consola.mostrar_exito("Matriz recorrida exitosamente")
                 """;
 
         System.out.println("════════════════════════════════════════");
