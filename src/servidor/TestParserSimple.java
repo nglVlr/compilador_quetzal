@@ -11,14 +11,9 @@ import java.util.*;
 public class TestParserSimple {
     public static void main(String[] args) {
         String codigo = """
-                
-                entero funcion suma(entero a, entero b) {
-                    retornar a + b
+                para (entero i=0; i<10; i++){
+                entero suma=suma+i
                 }
-                
-                entero r = suma(2)
-                consola.mostrar(t"r = {r}")
-                
                 """;
 
         System.out.println("════════════════════════════════════════");
@@ -143,7 +138,7 @@ public class TestParserSimple {
             case LISTA: case JSN: case VAR:
             case SI: case SINO: case SINO_SI: case MIENTRAS: case PARA:
             case EN: case HACER: case RETORNAR: case ROMPER: case CONTINUAR:
-           // case FUNCION: case ASYNC: case ESPERAR:
+            case FUNCION: case ASYNC: case ESPERAR:
             case OBJETO: case NUEVO: case AMBIENTE: case PRIVADO: case PUBLICO: case ESTATICO:
             case IMPORTAR: case EXPORTAR: case DESDE:
             case INTENTAR: case CAPTURAR: case FINALMENTE: case LANZAR:
