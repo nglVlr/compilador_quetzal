@@ -11,29 +11,14 @@ import java.util.*;
 public class TestParserSimple {
     public static void main(String[] args) {
         String codigo = """
-                lista<lista<entero>> var matriz = [
-                    [1, 2, 3],
-                    [4, 5, 6],
-                    [7, 8, 9]
-                ]
                 
-                consola.mostrar_informacion("══════════════════════════")
-                consola.mostrar_informacion("   MATRIZ 3x3")
-                consola.mostrar_informacion("══════════════════════════")
-                
-                entero var fila = 0
-                mientras (fila < 3) {
-                    lista<entero> fila_actual = matriz.obtener(fila)
-                    entero var col = 0
-                    mientras (col < 3) {
-                        entero valor = fila_actual.obtener(col)
-                        consola.mostrar(t"matriz[{fila}][{col}] = {valor}")
-                        col++
-                    }
-                    fila++
+                entero funcion suma(entero a, entero b) {
+                    retornar a + b
                 }
                 
-                consola.mostrar_exito("Matriz recorrida exitosamente")
+                entero r = suma(2)
+                consola.mostrar(t"r = {r}")
+                
                 """;
 
         System.out.println("════════════════════════════════════════");
@@ -158,7 +143,7 @@ public class TestParserSimple {
             case LISTA: case JSN: case VAR:
             case SI: case SINO: case SINO_SI: case MIENTRAS: case PARA:
             case EN: case HACER: case RETORNAR: case ROMPER: case CONTINUAR:
-            case FUNCION: case ASYNC: case ESPERAR:
+           // case FUNCION: case ASYNC: case ESPERAR:
             case OBJETO: case NUEVO: case AMBIENTE: case PRIVADO: case PUBLICO: case ESTATICO:
             case IMPORTAR: case EXPORTAR: case DESDE:
             case INTENTAR: case CAPTURAR: case FINALMENTE: case LANZAR:
