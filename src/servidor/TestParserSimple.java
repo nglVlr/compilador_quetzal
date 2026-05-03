@@ -11,9 +11,14 @@ import java.util.*;
 public class TestParserSimple {
     public static void main(String[] args) {
         String codigo = """
-                para (entero i=0; i<10; i++){
-                entero suma=suma+i
+                entero suma(entero a, entero b){
+                  retornar a + b
                 }
+                
+                entero var r
+                
+                r = suma(2, 3)
+                consola.mostrar(r)
                 """;
 
         System.out.println("════════════════════════════════════════");
@@ -80,7 +85,6 @@ public class TestParserSimple {
         ImpressorAST imp = new ImpressorAST();
         System.out.println(ast.aceptar(imp));
 
-/*
         // FASE 3 - SEMÁNTICO
         AnalizadorSemantico semantico = new AnalizadorSemantico();
         semantico.analizar(ast);
@@ -127,7 +131,7 @@ public class TestParserSimple {
             System.out.println("COMPILACIÓN EXITOSA - .class listo para JVM");
         } else {
             System.out.println("COMPILACIÓN FALLIDA - revisa los errores anteriores");
-        }*/
+        }
         System.out.println("---------------------------------------");
 
     }

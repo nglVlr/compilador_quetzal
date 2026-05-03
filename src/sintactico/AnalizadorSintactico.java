@@ -891,7 +891,7 @@ public class AnalizadorSintactico {
                 case ENTERO: case NUMERO: case TEXTO: case LOG: case VACIO:
                 case LISTA: case JSN:
                 case SI: case MIENTRAS: case PARA: case HACER:
-                case RETORNAR: case FUNCION: case OBJETO:
+                case RETORNAR: case OBJETO:
                 case INTENTAR: case LANZAR:
                 case IMPORTAR: case EXPORTAR:
                     return;

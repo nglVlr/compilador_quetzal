@@ -46,7 +46,7 @@ public class AnalizadorLexico {
         PALABRAS_RESERVADAS.put("continuar",  TipoToken.CONTINUAR);
 
         // --- Funciones ---
-        PALABRAS_RESERVADAS.put("funcion",    TipoToken.FUNCION);
+        //PALABRAS_RESERVADAS.put("funcion",    TipoToken.FUNCION);
         PALABRAS_RESERVADAS.put("async",      TipoToken.ASYNC);
         PALABRAS_RESERVADAS.put("esperar",    TipoToken.ESPERAR);
 

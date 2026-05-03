@@ -77,6 +77,33 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
             }
         }
 
+        StringBuilder miembrosClase = new StringBuilder(); // funciones y objetos
+        StringBuilder cuerpoMain    = new StringBuilder(); // sentencias ejecutables
+
+        // Separar: funciones/objetos van fuera de main; el resto va dentro
+        nivelIndentacion = 1; // nivel clase
+        for (int i = 0; i < n.sentencias.size(); i++) {
+            Nodo s = n.sentencias.get(i);
+            if (s instanceof NodoDeclaracionFuncion || s instanceof NodoDeclaracionObjeto) {
+                String codigo = s.aceptar(this);
+                if (codigo != null && !codigo.isEmpty()) {
+                    miembrosClase.append(codigo).append("\n\n");
+                }
+            }
+        }
+
+        nivelIndentacion = 2; // nivel main (clase + método)
+        for (int i = 0; i < n.sentencias.size(); i++) {
+            Nodo s = n.sentencias.get(i);
+            if (!(s instanceof NodoDeclaracionFuncion) && !(s instanceof NodoDeclaracionObjeto)) {
+                String codigo = s.aceptar(this);
+                if (codigo != null && !codigo.isEmpty()) {
+                    cuerpoMain.append(codigo).append("\n");
+                }
+            }
+        }
+
+        // Ensamblar el archivo Java final
         StringBuilder sb = new StringBuilder();
         sb.append("import java.util.Scanner;\n");
         sb.append("import java.util.ArrayList;\n");
@@ -84,28 +111,22 @@ public class GeneradorCodigo implements VisitanteNodo<String> {
         sb.append("\n");
         sb.append("public class ProgramaQuetzal {\n");
         sb.append("\n");
-        sb.append("    public static void main(String[] args) {\n");
 
+        // Métodos estáticos y clases anidadas FUERA de main
+        if (miembrosClase.length() > 0) {
+            sb.append(miembrosClase);
+        }
+
+        // Método main
+        sb.append("    public static void main(String[] args) {\n");
         if (necesitaScanner) {
             sb.append("        Scanner scanner = new Scanner(System.in);\n");
         }
-
         sb.append("\n");
-        subirNivel(); subirNivel(); // dos niveles: clase + main
-
-        for (int i = 0; i < n.sentencias.size(); i++) {
-            String sentencia = n.sentencias.get(i).aceptar(this);
-            if (sentencia != null && !sentencia.isEmpty()) {
-                sb.append(sentencia).append("\n");
-            }
-        }
-
-        bajarNivel(); bajarNivel();
-
+        sb.append(cuerpoMain);
         if (necesitaScanner) {
             sb.append("        scanner.close();\n");
         }
-
         sb.append("    }\n");
         sb.append("}\n");
 
